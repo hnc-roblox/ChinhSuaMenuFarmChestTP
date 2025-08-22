@@ -417,7 +417,7 @@ function TeleportLoop()
     end
 end
 
--- ⚡ Chờ 60 giây sau khi bật script rồi hop
-task.delay(75, function()
+-- ⚡ Chờ 100 giây sau khi bật script rồi hop
+task.delay(100, function()
     TeleportLoop()
 end)
