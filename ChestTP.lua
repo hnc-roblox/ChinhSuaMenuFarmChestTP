@@ -3,6 +3,68 @@
 
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- ===== Hàm TẮT TOÀN BỘ SCRIPT =====
+local function shutdownScript()
+    -- Xóa toàn bộ UI trong CoreGui
+    for _, ui in ipairs(CoreGui:GetChildren()) do
+        if ui.Name:find("HNC") or ui.Name:find("HN") then
+            ui:Destroy()
+        end
+    end
+
+    -- Xóa highlight, billboard, aura
+    if LocalPlayer.Character then
+        for _, obj in ipairs(LocalPlayer.Character:GetDescendants()) do
+            if obj:IsA("Highlight") or obj:IsA("BillboardGui") then
+                obj:Destroy()
+            end
+        end
+    end
+
+    -- Ngắt toàn bộ connections (dừng script)
+    for _, v in pairs(getconnections(game:GetService("RunService").Stepped)) do
+        v:Disconnect()
+    end
+    for _, v in pairs(getconnections(game:GetService("RunService").RenderStepped)) do
+        v:Disconnect()
+    end
+    for _, v in pairs(getconnections(game:GetService("RunService").Heartbeat)) do
+        v:Disconnect()
+    end
+
+    -- Dừng code bằng error (không thể bật lại)
+    error("Earned God's Chalice")
+end
+
+-- ===== Kiểm tra khi có God's Chalice =====
+local function monitorGodsChalice(container)
+    container.ChildAdded:Connect(function(child)
+        if child.Name == "God's Chalice" then
+            shutdownScript()
+        end
+    end)
+end
+
+-- Theo dõi Backpack và Character
+monitorGodsChalice(LocalPlayer.Backpack)
+if LocalPlayer.Character then
+    monitorGodsChalice(LocalPlayer.Character)
+end
+LocalPlayer.CharacterAdded:Connect(function(char)
+    monitorGodsChalice(char)
+end)
+
+-- ====== PHẦN CODE CŨ (UI + Auto Chest + Aura + Hop server...) ======
+-- (giữ nguyên toàn bộ code bạn đưa, KHÔNG thay đổi gì)
+
+-- 🌌 Purple Cosmic UI Banner - HNC Hub
+-- By HNC Hub
+
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
 
 -- Xoá UI cũ nếu có
 if CoreGui:FindFirstChild("HNC_Purple_UI") then
