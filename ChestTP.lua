@@ -1,3 +1,23 @@
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+local Notification = require(game:GetService("ReplicatedStorage").Notification)
+
+local function showWelcomeNotification()
+    -- Thông báo chào mừng
+    Notification.new("<Color=Purple>HNC Hub - Auto Collect Chest<Color=/>"):Display()
+end
+
+-- Hiển thị lần đầu khi script bật
+showWelcomeNotification()
+
+-- Hiển thị lại khi respawn
+plr.CharacterAdded:Connect(function(char)
+    -- chờ nhân vật load xong
+    char:WaitForChild("HumanoidRootPart")
+    task.wait(0.5) -- chờ tí để tránh lỗi
+    showWelcomeNotification()
+end)
+
 -- 🌌 Purple Cosmic UI Banner - HNC Hub
 -- By HNC Hub
 
@@ -186,7 +206,7 @@ end
 -- Tự áp lại khi respawn
 LocalPlayer.CharacterAdded:Connect(function(char)
     char:WaitForChild("HumanoidRootPart")
-    task.wait(1)
+    task.wait()
     applyPurpleAura(char)
 end)
 
@@ -480,7 +500,7 @@ function TeleportLoop()
 end
 
 -- ⚡ Chờ 60 giây sau khi bật script rồi hop
-task.delay(150, function()
+task.delay(180, function()
     TeleportLoop()
 end)
 -- 🌌 Auto Reset + Invisible (respawn support) + Clear Map (ghi chú màu tím)
