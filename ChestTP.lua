@@ -205,21 +205,8 @@ player.AncestryChanged:Connect(function(_, parent)
         -- client đang bị remove, nothing to do
     end
 end)
-local MaxSpeed = 300 -- Studs per second 380 no flag but kick
-
 local LocalPlayer = game:GetService("Players").LocalPlayer
-local rs = game:GetService("ReplicatedStorage")
 local Locations = workspace._WorldOrigin.Locations
-
--- Đổi team liên tục sang Marines
-task.spawn(function()
-    while true do
-        pcall(function()
-            rs.Remotes.CommF_:InvokeServer("SetTeam", "Marines")
-        end)
-        task.wait()
-    end
-end)
 
 local function getCharacter()
     if not LocalPlayer.Character then
@@ -239,9 +226,7 @@ local function DistanceFromPlrSort(ObjectList: table)
     end)
 end
 
-local UncheckedChests = {}
-local FirstRun = true
-
+local UncheckedChests, FirstRun = {}, true
 local function getChestsSorted()
     if FirstRun then
         FirstRun = false
@@ -261,35 +246,53 @@ local function getChestsSorted()
     return Chests
 end
 
--- Bỏ bay, chỉ tp
-local function Teleport(Goal: CFrame)
-    local RootPart = getCharacter().HumanoidRootPart
-    RootPart.CFrame = Goal
+local function toggleNoclip(Toggle: boolean)
+    for _, v in pairs(getCharacter():GetChildren()) do
+        if v:IsA("BasePart") then
+            v.CanCollide = not Toggle
+        end
+    end
 end
 
--- Chạy vòng chest
-local function runChestLoop()
+local function Teleport(Goal: CFrame)
+    local RootPart = getCharacter().HumanoidRootPart
+    toggleNoclip(true)
+    RootPart.CFrame = Goal + Vector3.new(0, 3, 0)
+    toggleNoclip(false)
+end
+
+-- Auto farm loop (restart khi respawn)
+local function startFarm()
     task.spawn(function()
-        while LocalPlayer.Character and LocalPlayer.Character.Parent do
+        while task.wait() do
             local Chests = getChestsSorted()
             if #Chests > 0 then
                 Teleport(Chests[1].CFrame)
             else
-                -- chỗ này bạn có thể serverhop nếu muốn
+                -- serverhop ở đây nếu muốn
             end
-            task.wait()
         end
     end)
 end
 
--- Chạy lần đầu
-runChestLoop()
-
--- Auto áp lại khi respawn
-LocalPlayer.CharacterAdded:Connect(function()
-    getCharacter() -- chờ nhân vật load xong
-    runChestLoop()
+-- Auto đổi team sang Hải Quân liên tục
+task.spawn(function()
+    local rs = game:GetService("ReplicatedStorage")
+    while task.wait(5) do
+        pcall(function()
+            rs.Remotes.CommF_:InvokeServer("SetTeam","Marines")
+        end)
+    end
 end)
+
+-- Khi respawn thì tự động khởi động farm lại
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(1) -- chờ nhân vật load
+    startFarm()
+end)
+
+-- Chạy farm lần đầu
+startFarm()
 
 -- 🌍 Auto Server Hop sau 60 giây + Hiệu ứng màn hình đen
 -- By HNC Hub
