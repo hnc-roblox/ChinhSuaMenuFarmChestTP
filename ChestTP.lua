@@ -1,3 +1,18 @@
+-- 🌌 Auto Jump Script
+-- Bật lên = nhảy liên tục
+-- Tắt đi = dừng nhảy (chỉ cần rejoin game)
+
+local player = game.Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+task.spawn(function()
+    while task.wait(1) do
+        if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+            player.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
 -- 🌌 Purple Cosmic UI Banner - HNC Hub
 -- By HNC Hub
 
@@ -278,7 +293,7 @@ end
 -- Auto đổi team sang Hải Quân liên tục
 task.spawn(function()
     local rs = game:GetService("ReplicatedStorage")
-    while task.wait(5) do
+    while task.wait() do
         pcall(function()
             rs.Remotes.CommF_:InvokeServer("SetTeam","Marines")
         end)
@@ -287,7 +302,7 @@ end)
 
 -- Khi respawn thì tự động khởi động farm lại
 LocalPlayer.CharacterAdded:Connect(function()
-    task.wait(1) -- chờ nhân vật load
+    task.wait() -- chờ nhân vật load
     startFarm()
 end)
 
